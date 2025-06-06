@@ -41,9 +41,7 @@ public class UserController {
     @GetMapping("/getAllRegisteredUser/{id}")
     @Operation(summary = "Retrieves registered user ", description = "Retrieves registered user by id")
     public ResponseEntity<UserResponseDto> getUser(@PathVariable Long id) {
-       if(id == null) {
-           id = (long) 1;
-       }
+
         long start = System.currentTimeMillis();
         log.info("Fetching user with ID: {}", id);
 
