@@ -15,7 +15,7 @@ public class UserService {
 
     public UserResponseDto register(UserRequestDto userDto) {
         UserEntity userentity  = userDoa.register(userDto);
-        return UserResponseDto.builder().name(userentity.getName()).age(userentity.getAge()).email(userentity.getEmail()).
+        return UserResponseDto.builder().id(userentity.getId()).name(userentity.getName()).age(userentity.getAge()).email(userentity.getEmail()).
                 country(userentity.getCountry()).build();
 
     }
@@ -24,7 +24,7 @@ public class UserService {
     public Optional<UserResponseDto> getUser(Long id) {
 
         UserEntity userentity =  userDoa.findById(id).get();
-        return Optional.of(UserResponseDto.builder().name(userentity.getName()).age(userentity.getAge()).email(userentity.getEmail()).
+        return Optional.of(UserResponseDto.builder().id(userentity.getId()).name(userentity.getName()).age(userentity.getAge()).email(userentity.getEmail()).
                 country(userentity.getCountry()).build());
  }
 

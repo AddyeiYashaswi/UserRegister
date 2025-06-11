@@ -1,5 +1,6 @@
 package com.user.registrtn;
 
+import com.user.registrtn.exception.InvalidAgeOrCountryException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -10,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
+import java.util.function.UnaryOperator;
 
 @RestController
 @RequestMapping("/api/users")
@@ -17,13 +19,17 @@ import java.util.Optional;
 @Tag(name = "User Registration", description = "Operations related to user registration and retrieval")
 public class UserController {
 
+    String functionName = "";
+
+    UnaryOperator<String> errorMessage = (input) -> "Exception in class :: UserController at method :: "+ input ;
+
     @Autowired
     private UserService userService;
 
     @PostMapping("/register")
     @Operation(summary = "Register a new user", description = "Registers a user if they are residing in france and age is greater than 18")
     public ResponseEntity<String> register( @Valid @RequestBody UserRequestDto userDto) {
-
+        functionName = "register";
         long start = System.currentTimeMillis();
         log.info("register user details " + userDto.toString());
         if(userDto.getAge() > 18 && userDto.getCountry().equalsIgnoreCase("France")) {
@@ -32,18 +38,24 @@ public class UserController {
             long end = System.currentTimeMillis();
 
             log.info("saved user details " + savedUser.toString());
-            return new ResponseEntity<String>(userDto.toString(), HttpStatus.CREATED);
+
+            return new ResponseEntity<String>(savedUser.toString(), HttpStatus.CREATED);
+
         }
-         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+         log.info(errorMessage.apply(functionName));
+
+         throw new InvalidAgeOrCountryException("Invalid Age or Country : Age> 18 and  should belongs to France Country");
 
     }
 
-    @GetMapping("/getAllRegisteredUser/{id}")
+    @GetMapping("/getRegisteredUser/{id}")
     @Operation(summary = "Retrieves registered user ", description = "Retrieves registered user by id")
     public ResponseEntity<UserResponseDto> getUser(@PathVariable Long id) {
-
+        functionName = "getRegisteredUser";
         long start = System.currentTimeMillis();
+
         log.info("Fetching user with ID: {}", id);
+
 
            Optional<UserResponseDto> user = userService.getUser(id);
            long end = System.currentTimeMillis();
@@ -52,7 +64,8 @@ public class UserController {
               log.info("User found: {} in {} ms", user.get(), (end - start));
                 return ResponseEntity.ok(user.get());
              } else {
-                log.warn("User not found with ID: {}", id);
+                log.info(errorMessage.apply(functionName) + "User not found with ID: {}", id);
+
                 return new ResponseEntity(HttpStatus.NOT_FOUND);
             }
 
