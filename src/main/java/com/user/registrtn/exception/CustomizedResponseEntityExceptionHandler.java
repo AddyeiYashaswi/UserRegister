@@ -32,5 +32,12 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
         return new ResponseEntity<ErrorDetails>(ErrorDetails.builder().timestamp(LocalDateTime.now()).message(ex.getMessage()).details(request.getDescription(false)).build(),
                 HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(value = {UserNotFoundException.class})
+    public ResponseEntity<ErrorDetails>handleUserNotFound(Exception ex, WebRequest request) {
+        return new ResponseEntity<ErrorDetails>(ErrorDetails.builder().timestamp(LocalDateTime.now()).message(ex.getMessage()).details(request.getDescription(false)).build(),
+                HttpStatus.NOT_FOUND);
+    }
+
     }
 

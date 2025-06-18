@@ -4,6 +4,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -20,5 +21,10 @@ public class UserDoa {
 
     public Optional<UserEntity> findById(Long id) {
         return userRepository.findById(id);
+    }
+
+
+    public List<UserEntity> findByAll() {
+        return userRepository.findAll();
     }
 }
