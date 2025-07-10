@@ -14,6 +14,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
@@ -31,7 +32,9 @@ public class SpringSecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeRequests(requests -> requests.anyRequest().authenticated()).
+        http.authorizeRequests(requests -> requests.requestMatchers("/api/users/**").
+                        permitAll().anyRequest().authenticated()).
+//        http.authorizeRequests(requests -> requests.anyRequest().authenticated()).
                 httpBasic(Customizer.withDefaults()).csrf(csrf -> csrf.disable()).
                 sessionManagement(session ->session.
                         sessionCreationPolicy(SessionCreationPolicy.STATELESS)).headers(headers->
@@ -42,10 +45,15 @@ public class SpringSecurityConfig {
 
     @Bean
     public JdbcUserDetailsManager userDetailsManager(DataSource dataSource) {
-        UserDetails userDetails = User.withUsername("Yash").password("{noop}Yash").roles("ADMIN").build();
-
+        //   Without Hashing
+        //   UserDetails userDetails = User.withUsername("Yash").password("{noop}Yash").roles("ADMIN").build();
+        UserDetails userDetails = User.withUsername("Yash").password("Yash").
+                passwordEncoder(pass->bCryptPasswordEncoder().encode(pass)).roles("ADMIN").build();
+        UserDetails userDetails1 = User.withUsername("user").password("user").
+                passwordEncoder(pass->bCryptPasswordEncoder().encode(pass)).roles("USER").build();
     JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
     jdbcUserDetailsManager.createUser(userDetails);
+    jdbcUserDetailsManager.createUser(userDetails1);
     return jdbcUserDetailsManager;
 
     }
@@ -57,5 +65,13 @@ public class SpringSecurityConfig {
                 JdbcDaoImpl.DEFAULT_USER_SCHEMA_DDL_LOCATION).build();
 
     }
+
+    //hash the password to be stored in DB
+    @Bean
+    public BCryptPasswordEncoder bCryptPasswordEncoder()
+    {
+        return new BCryptPasswordEncoder();
+    }
+
 
 }
