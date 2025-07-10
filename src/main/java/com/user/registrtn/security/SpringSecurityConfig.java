@@ -32,8 +32,7 @@ public class SpringSecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeRequests(requests -> requests.requestMatchers("/api/users/**").
-                        permitAll().anyRequest().authenticated()).
+        http.authorizeRequests(requests -> requests.anyRequest().authenticated()).
 //        http.authorizeRequests(requests -> requests.anyRequest().authenticated()).
                 httpBasic(Customizer.withDefaults()).csrf(csrf -> csrf.disable()).
                 sessionManagement(session ->session.
